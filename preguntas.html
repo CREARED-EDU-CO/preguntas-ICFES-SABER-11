@@ -724,57 +724,180 @@
 
 		function generarPrompt(datos) {
 			let promptMateria = '';
+			
+			// Definiciones de niveles de competencia extraídas de los lineamientos del ICFES
 			switch (datos.valorMateria) {
 				case "LECTURA CRÍTICA":
-					promptMateria = `\nCompetencia 1 - Identificar y entender los contenidos locales que conforman un texto: Entender el significado de palabras, frases y fragmentos breves en su contexto inmediato.\nCompetencia 2 - Comprender cómo se articulan las partes de un texto para darle un sentido global: Identificar la estructura interna, idea central y relación lógica entre párrafos.\nCompetencia 3 - Reflexionar a partir de un texto y evaluar su contenido: Análisis crítico, intención del autor, estrategias retóricas y validez de argumentos.`;
+					promptMateria = `
+Competencia 1 - Identificar y entender los contenidos locales que conforman un texto: Entender el significado de palabras, frases y fragmentos breves en su contexto inmediato.
+Competencia 2 - Comprender cómo se articulan las partes de un texto para darle un sentido global: Identificar la estructura interna, idea central y relación lógica entre párrafos.
+Competencia 3 - Reflexionar a partir de un texto y evaluar su contenido: Análisis crítico, intención del autor, estrategias retóricas y validez de argumentos.`;
 					break;
 				case "FILOSOFÍA":
-					promptMateria = `\nCompetencia 1 - Reconocimiento de conceptos y tesis: Identificación de términos técnicos y la posición central del filósofo.\nCompetencia 2 - Análisis de relaciones lógicas: Comprender el paso de las premisas a la conclusión, identificar conectores argumentativos y la función de analogías.\nCompetencia 3 - Diálogo dialéctico y crítico: Identificar supuestos implícitos, evaluar la solidez de la tesis frente a contraargumentos y situar el problema en la historia de las ideas.`;
+					promptMateria = `
+Competencia 1 - Reconocimiento de conceptos y tesis: Identificación de términos técnicos y la posición central del filósofo.
+Competencia 2 - Análisis de relaciones lógicas: Comprender el paso de las premisas a la conclusión, identificar conectores argumentativos y la función de analogías.
+Competencia 3 - Diálogo dialéctico y crítico: Identificar supuestos implícitos, evaluar la solidez de la tesis frente a contraargumentos y situar el problema en la historia de las ideas.`;
 					break;
 				case "MATEMÁTICAS":
-					promptMateria = `\nCompetencia 1 - Interpretación y representación: Capacidad de comprender y transformar información presentada en diversos formatos. Incluye extracción de información e identificación de patrones.\nCompetencia 2 - Formulación y ejecución: Capacidad de plantear estrategias para resolver problemas.\nCompetencia 3 - Argumentación: Capacidad de validar o refutar conclusiones mediante justificaciones.`;
+					promptMateria = `
+Competencia 1 - Interpretación y representation: Capacidad de comprender y transformar información presentada en diversos formatos (tablas, gráficas, conjuntos de datos, diagramas). Incluye la extracción de información relevante e identificación de tendencias y patrones.
+Competencia 2 - Formulación y ejecución: Capacidad de plantear y diseñar estrategias para resolver problemas en contextos matemáticos y de la vida cotidiana. Implica seleccionar y verificar la pertinencia de soluciones y procedimientos.
+Competencia 3 - Argumentación: Capacidad de validar o refutar conclusiones, estrategias y soluciones mediante justificaciones, ejemplos y contraejemplos, identificando inconsistencias o errores en razonamientos.`;
 					break;
 				case "BIOLOGÍA":
-					promptMateria = `\nCompetencia 1 - Uso comprensivo del conocimiento científico: Comprender conceptos biológicos.\nCompetencia 2 - Explicación de fenómenos: Construir explicaciones basadas en observaciones.\nCompetencia 3 - Indagación: Comprender cómo se construye el conocimiento a partir de la investigación científica.`;
+					promptMateria = `
+Competencia 1 - Uso comprensivo del conocimiento científico: Capacidad para comprender y usar conceptos de biología (ej: genética, evolución, ecosistemas) en la solución de problemas.
+Competencia 2 - Explicación de fenómenos: Capacidad para construir explicaciones y modelos que den razón de fenómenos biológicos (ej: redes tróficas, ciclos celulares), basándose en observaciones.
+Competencia 3 - Indagación: Capacidad para comprender cómo se construye el conocimiento biológico a partir de la investigación científica (ej: diseño experimental, análisis de datos en poblaciones).`;
 					break;
 				case "QUÍMICA":
-					promptMateria = `\nCompetencia 1 - Uso comprensivo del conocimiento científico: Comprender conceptos químicos.\nCompetencia 2 - Explicación de fenómenos: Explicar fenómenos como reacciones o pH.\nCompetencia 3 - Indagación: Comprender el diseño experimental y leyes de conservación.`;
+					promptMateria = `
+Competencia 1 - Uso comprensivo del conocimiento científico: Capacidad para comprender y usar conceptos de química (ej: estequiometría, estructura atómica, enlaces) en la solución de problemas.
+Competencia 2 - Explicación de fenómenos: Capacidad para construir explicaciones y modelos que den razón de fenómenos químicos (ej: reacciones, equilibrio químico, pH), basándose en observaciones.
+Competencia 3 - Indagación: Capacidad para comprender cómo se construye el conocimiento químico a partir de la investigación científica (ej: variables en una reacción, leyes de conservación).`;
 					break;
 				case "FÍSICA":
-					promptMateria = `\nCompetencia 1 - Uso comprensivo del conocimiento científico: Comprender conceptos de cinemática, dinámica, etc.\nCompetencia 2 - Explicación de fenómenos: Razón de fenómenos físicos.\nCompetencia 3 - Indagación: Identificación de variables y diseño experimental.`;
+					promptMateria = `
+Competencia 1 - Uso comprensivo del conocimiento científico: Capacidad para comprender y usar conceptos de física (ej: cinemática, dinámica, energía) en la solución de problemas.
+Competencia 2 - Explicación de fenómenos: Capacidad para construir explicaciones y modelos que den razón de fenómenos físicos (ej: leyes de Newton, termodinámica, ondas), basándose en observaciones.
+Competencia 3 - Indagación: Capacidad para comprender cómo se construye el conocimiento físico a partir de la investigación científica (ej: identificación de variables dependientes e independientes).`;
 					break;
 				case "COMPETENCIAS CIUDADANAS":
-					promptMateria = `\nCompetencia 1 - Pensamiento Social: Conceptos políticos y cívicos.\nCompetencia 2 - Interpretación y Análisis de Perspectivas: Evaluar intenciones y prejuicios.\nCompetencia 3 - Pensamiento Reflexivo y Sistémico: Analizar problemas multidimensionales.`;
+					promptMateria = `
+Competencia 1 - Pensamiento Social: Capacidad de usar conceptos políticos y cívicos para comprender modelos como el Estado Social de Derecho, el Gobierno Escolar, derechos fundamentales y mecanismos de participación ciudadana.
+Competencia 2 - Interpretación y Análisis de Perspectivas: Habilidad para evaluar intenciones y prejuicios de actores en conflictos sociales, identificando paradojas entre discurso y comportamiento.
+Competencia 3 - Pensamiento Reflexivo y Sistémico: Capacidad de analizar problemas sociales multidimensionales, evaluando la validez de conclusiones y el impacto de políticas públicas.`;
 					break;
 				case "HISTORIA":
-					promptMateria = `\nCompetencia 1 - Pensamiento Social: Procesos históricos y su relevancia.\nCompetencia 2 - Interpretación y Análisis de Perspectivas: Fuentes primarias en su contexto.\nCompetencia 3 - Pensamiento Reflexivo y Sistémico: Relaciones de causalidad.`;
+					promptMateria = `
+Competencia 1 - Pensamiento Social: Capacidad de usar conceptos históricos para comprender procesos, hechos y contextos (ej: Guerra Fría, procesos de paz, modelos económicos del siglo XX) y su relevancia en la actualidad.
+Competencia 2 - Interpretación y Análisis de Perspectivas: Habilidad para inscribir fuentes primarias (discursos, leyes) en su contexto histórico, comparando visiones de distintos actores en hechos del pasado.
+Competencia 3 - Pensamiento Reflexivo y Sistémico: Capacidad de comprender las múltiples dimensiones de un hecho histórico y analizar las relaciones de causalidad, afinidad o incompatibilidad entre ellas.`;
 					break;
 				case "GEOGRAFÍA":
-					promptMateria = `\nCompetencia 1 - Pensamiento Social: Conceptos geográficos y ordenamiento territorial.\nCompetencia 2 - Interpretación y Análisis de Perspectivas: Visiones sobre recursos naturales.\nCompetencia 3 - Pensamiento Reflexivo y Sistémico: Problemas territoriales multidimensionales.`;
+					promptMateria = `
+Competencia 1 - Pensamiento Social: Capacidad de usar conceptos geográficos para comprender modelos de desarrollo, ordenamiento territorial y la relación entre el ser humano y el espacio geográfico.
+Competencia 2 - Interpretación y Análisis de Perspectivas: Habilidad para evaluar las visiones de distintos grupos sociales frente al uso de recursos naturales, flujos migratorios y el impacto ambiental.
+Competencia 3 - Pensamiento Reflexivo y Sistémico: Capacidad de analizar problemas territoriales desde dimensiones ambientales, económicas y políticas, evaluando efectos no deseados de la intervención humana en el espacio.`;
 					break;
 				case "INGLÉS":
-					promptMateria = `\nNiveles Pre-A1 a B1. Partes 1 (léxico), 2 (sociolingüístico), 3 (lectura literal), 4 (inferencial) y 5 (gramatical).`;
+					promptMateria = `
+Los niveles evaluados son Pre-A1, A1, A2 y B1 según el Marco Común Europeo de Referencia (MCER). La prueba se organiza en:
+- Parte 1: Conocimiento léxico. Relacionar definiciones con la palabra correcta. (Niveles Pre-A1 y A1).
+- Parte 2: Conocimiento pragmático y sociolingüístico. Completar conversaciones cortas eligiendo la respuesta más pertinente. (Niveles A1 y A2).
+- Parte 3: Comprensión de lectura literal. Encontrar información específica y parafraseada en un texto. (Niveles A2 y B1).
+- Parte 4: Comprensión de lectura inferencial. Identificar intención del autor, idea global, opiniones y posturas. (Nivel B1).
+- Parte 5: Conocimiento léxico y gramatical. Completar un texto (cloze test) eligiendo la palabra correcta por significado o función sintáctica. (Nivel B1).`;
 					break;
 				default:
-					promptMateria = `Desarrollo de competencias de interpretación, argumentación y proposición.`;
+					promptMateria = `Desarrollo de competencias de interpretación, argumentación y proposición específicas del área.`;
 			}
 
 			let instruccionAnalisis = '';
 			switch (datos.nivelDetalle) {
 				case 'completo':
-					instruccionAnalisis = `Para cada pregunta, DEBES incluir obligatoriamente el siguiente análisis técnico:\n1. **Competencia**\n2. **Afirmación**\n3. **Evidencia**\n4. **Estándar asociado**\n5. **¿Qué evalúa?**\n6. **Justificación de la respuesta correcta**\n7. **Justificación de opciones no válidas**`;
+					instruccionAnalisis = `Para cada pregunta, DEBES incluir obligatoriamente el siguiente análisis técnico siguiendo el modelo de las Guías de Orientación del ICFES:
+1. **Competencia**: Definir la competencia evaluada.
+2. **Afirmación**: Especificar la afirmación que se evalúa según el DCE.
+3. **Evidencia**: Indicar la evidencia observable.
+4. **Estándar asociado**: Vincular con los Estándares Básicos de Competencias del MEN.
+5. **¿Qué evalúa?**: Habilidad cognitiva puntual.
+6. **Justificación de la respuesta correcta**: Explicación detallada de por qué es la única válida basándose en el soporte.
+7. **Justificación de opciones no válidas**: Explicación técnica de por qué cada distractor es incorrecto.`;
 					break;
 				case 'solo_respuesta':
 					instruccionAnalisis = 'Proporciona la clave de respuestas correcta al final.';
 					break;
 				case 'solo_pregunta':
-					instruccionAnalisis = 'NO proporciones la clave de respuesta ni explicación técnica. Genera únicamente contexto, enunciado y opciones.';
+					instruccionAnalisis = 'NO proporciones la clave de respuesta correcta ni ninguna explicación o análisis técnico. El prompt debe generar únicamente el contexto, el enunciado y las opciones de respuesta.';
 					break;
 			}
 
-			const requisitosEspeciales = (datos.valorMateria === "LECTURA CRÍTICA") ? `\n- Contexto continuo/discontinuo.\n- Incluya fuente.` : (datos.valorMateria === "FILOSOFÍA") ? `\n- Fragmento de texto filosófico.\n- RECONOCIMIENTO DE TESIS.` : (datos.valorMateria === "COMPETENCIAS CIUDADANAS") ? `\n- Conflictos de intereses reales.\n- Distractores plausibles, no basados en "deber ser".` : (datos.valorMateria === "MATEMÁTICAS") ? `\n- Categoría (Álgebra, Geometría, Estadística).\n- Distractores basados en rutas erróneas.` : '';
+			const requisitosEspeciales = (datos.valorMateria === "LECTURA CRÍTICA")
+				? `\n**Requisitos específicos para LECTURA CRÍTICA:**
+- El **Contexto** debe ser un texto continuo (literario o informativo) o discontinuo (infografía, tabla) con alto rigor.
+- Evalúe la capacidad de identificar contenidos locales, estructura global y reflexión crítica.
+- Incluya siempre la fuente: "Tomado y adaptado de: [Fuente]".`
+				: (datos.valorMateria === "FILOSOFÍA")
+				? `\n**Requisitos específicos para FILOSOFÍA:**
+- El **Contexto** debe ser un fragmento de texto filosófico que permita evaluar la estructura argumentativa (premisas y conclusiones).
+- Priorice el reconocimiento de tesis, análisis de relaciones lógicas y diálogo dialéctico.
+- Incluya la fuente: "Tomado y adaptado de: [Fuente]".`
+				: (datos.valorMateria === "COMPETENCIAS CIUDADANAS")
+				? `\n**Requisitos específicos para COMPETENCIAS CIUDADANAS:**
+- El **Contexto** debe involucrar conflictos de intereses en situaciones reales o hipotéticas.
+- Priorice temas de **Gobierno Escolar**, **derechos fundamentales** (libre asociación, voto secreto), abuso de autoridad y mecanismos de participación.
+- **CRÍTICO:** Los distractores **NO** deben basarse en el "deber ser" o en lo políticamente correcto. Deben ser interpretaciones erróneas pero plausibles.`
+				: (datos.valorMateria === "HISTORIA")
+				? `\n**Requisitos específicos para HISTORIA:**
+- El **Contexto** debe basarse en procesos históricos (ej: Guerra Fría, siglo XX, procesos de paz).
+- Use **Fuentes Primarias** (discursos, leyes) para la interpretación.
+- Evite preguntas de memoria simple; enfatice la relación causa-efecto y la capacidad de discernir información relevante para una explicación histórica.`
+				: (datos.valorMateria === "GEOGRAFÍA")
+				? `\n**Requisitos específicos para GEOGRAFÍA:**
+- El **Contexto** debe centrarse en la relación ser humano-territorio.
+- Incluya temas como el **modelo extractivo de materias primas**, flujos migratorios (xenofobia, exilio) y gestión de recursos naturales.
+- En **Pensamiento Sistémico**, plantee propuestas territoriales con dimensiones ambientales y económicas en conflicto.`
+				: (datos.valorMateria === "BIOLOGÍA")
+						? `\n**Requisitos específicos para BIOLOGÍA:**
+- El **Contexto** debe centrarse en **Genética (Mendel, ADN), Redes tróficas, Ciclos reproductivos/hormonales, Relaciones ecológicas o Dinámica de ecosistemas**.
+- Use **Modelos Biológicos** (esquemas de cruces genéticos, diagramas de redes tróficas, gráficas de niveles hormonales) como soporte.
+- Las preguntas sobre experimentos deben enfatizar la importancia de **Grupos Control** y la validez de las conclusiones basadas en los datos observados.
+- Los distractores deben representar confusiones entre niveles de organización (individuo vs población), malinterpretación de relaciones causales en ecosistemas o errores en la predicción de genotipos.`
+						: (datos.valorMateria === "QUÍMICA")
+						? `\n**Requisitos específicos para QUÍMICA:**
+- El **Contexto** debe centrarse en **Propiedades de la materia, Estructura atómica, Enlaces químicos, Estequiometría, Termoquímica o Equilibrio químico (pH)**.
+- Incluya **Ecuaciones Químicas** balanceadas o **Tablas de Datos** (ej: valores de pH, puntos de fusión/ebullición, partículas subatómicas) como soporte.
+- Asegure la **Ley de Conservación de la Masa y Carga** en cualquier reacción presentada.
+- Los distractores deben basarse en errores de cálculo estequiométrico, mala interpretación de modelos atómicos o confusión en escalas (ej: escala de pH invertida).`
+						: (datos.valorMateria === "FÍSICA")
+						? `\n**Requisitos específicos para FÍSICA:**
+- El **Contexto** debe involucrar situaciones de los componentes de **Cinemática, Dinámica, Energía, Ondas, Termodinámica o Electricidad**.
+- Priorice el uso de **Modelos Físicos** (esquemas, diagramas de fuerzas, gráficas de movimiento) como soporte.
+- Las preguntas de **Indagación** deben presentar un diseño experimental donde se identifiquen variables independientes y dependientes.
+- Los distractores deben representar errores conceptuales comunes (ej: confundir velocidad con aceleración, calor con temperatura, o no conservar la energía).`
+						: (datos.valorMateria === "MATEMÁTICAS")
+							? `\n**Requisitos específicos para MATEMÁTICAS:**
+		- El **Contexto** debe enmarcarse en una de las tres categorías: **Álgebra y cálculo** (numérico-variacional), **Geometría** (geométrico-métrico) o **Estadística** (aleatorio). Puede ser un contexto puramente matemático o una situación de la vida cotidiana.
+		- El **Soporte** (tablas, datos, descripciones) debe ser suficiente para que el estudiante aplique procesos como razonar, resolver problemas o modelar.
+		- Los **Distractores** deben diseñarse basándose en "rutas de pensamiento" erróneas (ej: realizar una operación incorrecta, usar datos irrelevantes, aplicar una propiedad de forma indebida o quedarse en un paso intermedio del proceso).
+		- Asegure total coherencia con los Estándares Básicos de Competencias del MEN (ciclo 10-11).`
+							: (datos.valorMateria === "INGLÉS")
+								? `\n**Requisitos específicos para INGLÉS:**
+- Especifique en el prompt a qué **Parte** de la prueba (1, 2, 3, 4 o 5) corresponde la pregunta.
+- Para las **Partes 2 y 3**, use **3 opciones** de respuesta (A, B, C).
+- Para las **Partes 4 y 5**, use **4 opciones** de respuesta (A, B, C, D).
+- Para la **Parte 1**, genere una lista de descripciones y un conjunto de palabras (A-G) para relacionar.
+- El vocabulario y las estructuras gramaticales deben ser estrictamente coherentes con el nivel del MCER solicitado (${datos.nivelDificultad}).
+- Los distractores deben ser gramaticalmente correctos en su estructura interna, pero incorrectos para el contexto dado.`
+								: '';
+			return `Usted es un experto redactor de ítems de evaluación, especializado en el Diseño Centrado en Evidencias (DCE) que utiliza el ICFES para las pruebas SABER 11 de Colombia.
 
-			return `Usted es un experto redactor de ítems de evaluación para SABER 11 (Colombia).\nGenera una pregunta para **${datos.valorMateria}**.\n\n**Parámetros:**\n- Tema: ${datos.valorTemaPrincipal}\n- Subtema: ${datos.valorSubtema}\n- Competencia: ${datos.nivelDificultad}\n\n**Lineamientos:**${promptMateria}${requisitosEspeciales}\n\n**Estructura Obligatoria:**\n1. Contexto\n2. Enunciado\n3. Opciones (A, B, C, D)\n\n${instruccionAnalisis}\n\nRigor: Académico, formal, Diseño Centrado en Evidencias.`;
+Su tarea es generar una pregunta de selección múltiple con única respuesta para la materia de **${datos.valorMateria}**.
+
+**Parámetros de Contenido:**
+- **Tema:** ${datos.valorTemaPrincipal}
+- **Subtema:** ${datos.valorSubtema}
+- **Competencia Objetivo:** ${datos.nivelDificultad}
+
+**Lineamientos de Competencia para ${datos.valorMateria}:**
+${promptMateria}
+${requisitosEspeciales}
+
+**Estructura Obligatoria por pregunta:**
+1. **Contexto:** Soporte riguroso necesario para responder.
+2. **Enunciado (Stem):** Problema o pregunta de manera clara y directa.
+3. **Opciones de Respuesta:** Cuatro opciones (A, B, C, D), con una sola correcta y distractores plausibles.
+
+${instruccionAnalisis}
+
+**Rigor Técnico:**
+- Use lenguaje formal y académico.
+- Evite preguntas de memoria simple; priorice el análisis y la aplicación de conceptos.
+- Asegure total coherencia entre el Contexto y el Enunciado.
+
+Genere la pregunta ahora:`;
 		}
 
 		function poblarSelect(elementoSelect, opciones, textoDefecto) {
