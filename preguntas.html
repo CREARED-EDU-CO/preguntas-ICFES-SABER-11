@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Generador de Prompts para el ICFES SABER 11</title>
+	<style>
+		/* ============================
+		   Variables globales
+		   ============================ */
+
+		:root {
+			--font-principal: system-ui, sans-serif;
+			--color-fondo: #fff;
+			--color-texto: #333;
+			--color-primario: #6200ea;
+			--color-primario-hover: #3700b3;
+			--color-peligro: #ff0000;
+			--color-peligro-hover: #cc0000;
+			--color-texto-secundario: #666;
+			--sombra-caja: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.1);
+			--radio-borde-grande: 10px;
+			--radio-borde-pequeno: 5px;
+			--transicion-rapida: background-color 0.3s ease, color 0.3s ease;
+			--transicion-transformacion: transform 0.2s ease;
+		}
+
+		/* ============================
+		   Utilidades de accesibilidad
+		   ============================ */
+
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+
+		/* ============================
+		   Reset básico
+		   ============================ */
+
+		*,
+		*::before,
+		*::after {
+			box-sizing: border-box;
+		}
+
+		/* ============================
+		   Estilos generales
+		   ============================ */
+
+		body {
+			font-family: var(--font-principal);
+			line-height: 1.6;
+			margin: 0;
+			padding: 20px 0;
+			background-color: #f5f5f5;
+			color: var(--color-texto);
+		}
+
+		/* ============================
+		   Contenedor principal
+		   ============================ */
+
+		.contenedor {
+			width: 90%;
+			max-width: 800px;
+			margin: 40px auto;
+			padding: 30px;
+			background-color: var(--color-fondo);
+			border-radius: var(--radio-borde-grande);
+			box-shadow: var(--sombra-caja);
+		}
+
+		/* ============================
+		   Estilos del formulario
+		   ============================ */
+
+		form {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		form div {
+			display: flex;
+			flex-direction: column;
+		}
+
+		label {
+			margin-bottom: 8px;
+			font-weight: bold;
+			color: #444;
+		}
+
+		select {
+			padding: 12px;
+			border: 2px solid #eee;
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 16px;
+			font-family: var(--font-principal);
+			background-color: #fafafa;
+			color: var(--color-texto);
+			cursor: pointer;
+			transition: border-color 0.3s ease;
+		}
+
+		select:focus {
+			outline: none;
+			border-color: var(--color-primario);
+			background-color: #fff;
+		}
+
+		.campo-descripcion {
+			font-size: 0.9em;
+			color: var(--color-texto-secundario);
+			margin-bottom: 10px;
+			font-style: italic;
+		}
+
+		/* ============================
+		   Estilos de botones
+		   ============================ */
+
+		button, .modal-boton-ia {
+			padding: 15px;
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 16px;
+			font-weight: bold;
+			font-family: var(--font-principal);
+			border: none;
+			cursor: pointer;
+			letter-spacing: 1px;
+			text-transform: uppercase;
+			transition: var(--transicion-rapida), var(--transicion-transformacion);
+		}
+
+		button:active, .modal-boton-ia:active {
+			transform: scale(0.98);
+		}
+
+		form button {
+			background-color: var(--color-primario);
+			color: white;
+			margin-top: 10px;
+		}
+
+		form button:hover {
+			background-color: var(--color-primario-hover);
+			box-shadow: 0 4px 10px rgba(98, 0, 234, 0.3);
+		}
+
+		/* ============================
+		   Estilos de la ventana modal
+		   ============================ */
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1000;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.7);
+			backdrop-filter: blur(5px);
+		}
+
+		.modal-contenido {
+			background-color: var(--color-fondo);
+			margin: 20px auto;
+			padding: 25px;
+			width: 95%;
+			max-width: 700px;
+			max-height: 90vh;
+			border-radius: var(--radio-borde-grande);
+			box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+			overflow-y: auto;
+			position: relative;
+		}
+
+		.modal-boton-cerrar {
+			background-color: var(--color-peligro);
+			color: white;
+			width: 100%;
+			margin-bottom: 15px;
+		}
+
+		.modal-boton-cerrar:hover {
+			background-color: var(--color-peligro-hover);
+		}
+
+		/* Botones de IA específicos */
+		.modal-boton-ia {
+			display: block;
+			width: 100%;
+			text-align: center;
+			text-decoration: none;
+			margin-bottom: 10px;
+		}
+
+		#modalBotonChatGPT {
+			background-color: #10a37f;
+			color: white;
+		}
+
+		#modalBotonCopiar {
+			background-color: #6c757d;
+			color: white;
+		}
+
+		#modalBotonChatGPT:hover { background-color: #0d8a67; }
+		#modalBotonCopiar:hover { background-color: #5a6268; }
+
+		/* Resultado en la ventana modal */
+		#modalResultado {
+			display: block;
+			margin-top: 20px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			border: 1px solid #ddd;
+			border-radius: var(--radio-borde-pequeno);
+			white-space: pre-wrap;
+			word-wrap: break-word;
+			line-height: 1.6;
+			color: #222;
+			font-family: 'Consolas', 'Monaco', monospace;
+			font-size: 0.95rem;
+		}
+
+		/* ============================
+		   Responsiveness
+		   ============================ */
+
+		@media screen and (max-width: 800px) {
+			.contenedor {
+				width: 95%;
+				margin: 20px auto;
+				padding: 20px;
+			}
+		}
+
+		/* Estilos para el aviso de validación temporal */
+		.modal-aviso {
+			display: none;
+			position: absolute;
+			bottom: 110%;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: #333;
+			color: white;
+			padding: 10px 20px;
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 0.9rem;
+			white-space: nowrap;
+			z-index: 10;
+			box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+			animation: fadeIn 0.3s ease;
+		}
+
+		.modal-aviso.visible {
+			display: block;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translate(-50%, 10px); }
+			to { opacity: 1; transform: translate(-50%, 0); }
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<!-- Contenedor principal del formulario -->
+		<div class="contenedor">
+			<form id="formularioPrompt">
+				<!-- Selector de materia -->
+				<div>
+					<p id="materiaDesc" class="campo-descripcion">Selecciona la materia para la cual deseas generar un prompt.</p>
+					<label for="materia">Materia:</label>
+					<select id="materia" aria-describedby="materiaDesc">
+						<option value="">Selecciona una materia</option>
+						<option value="LECTURA CRÍTICA">LECTURA CRÍTICA</option>
+						<option value="FILOSOFÍA">FILOSOFÍA</option>
+						<option value="MATEMÁTICAS">MATEMÁTICAS</option>
+						<option value="FÍSICA">FÍSICA</option>
+						<option value="QUÍMICA">QUÍMICA</option>
+						<option value="BIOLOGÍA">BIOLOGÍA</option>
+						<option value="GEOGRAFÍA">GEOGRAFÍA</option>
+						<option value="HISTORIA">HISTORIA</option>
+						<option value="COMPETENCIAS CIUDADANAS">COMPETENCIAS CIUDADANAS</option>
+						<option value="INGLÉS">INGLÉS</option>
+					</select>
+				</div>
+				<!-- Selector de tema principal -->
+				<div>
+					<label for="temaPrincipal">Tema principal:</label>
+					<select id="temaPrincipal">
+						<option value="">Primero selecciona una materia</option>
+					</select>
+				</div>
+				<!-- Selector de subtema -->
+				<div>
+					<label for="subtema">Subtema:</label>
+					<select id="subtema">
+						<option value="">Primero selecciona un tema principal</option>
+					</select>
+				</div>
+				<!-- Selector de nivel de competencia y habilidad -->
+				<div>
+					<label for="nivelDificultad">Nivel de competencia:</label>
+					<select id="nivelDificultad">
+						<option value="">Selecciona un nivel</option>
+						<option value="BÁSICO (Solo la Competencia 1)">BÁSICO</option>
+						<option value="INTERMEDIO (Competencia 1 y Competencia 2)">INTERMEDIO</option>
+						<option value="AVANZADO (Todas las 3 Competencias)">AVANZADO</option>
+					</select>
+				</div>
+				<!-- Selector de nivel de detalle/análisis -->
+				<div>
+					<label for="nivelDetalle">Nivel de detalle de la respuesta:</label>
+					<select id="nivelDetalle">
+						<option value="">Selecciona que respuesta quieres</option>
+						<option value="completo">Pregunta con respuesta y explicación técnica</option>
+						<option value="solo_respuesta">Pregunta con respuesta solamente</option>
+						<option value="solo_pregunta">Solo pregunta (sin respuesta ni explicación)</option>
+					</select>
+				</div>
+				<!-- Botón para generar el prompt y abrir la ventana modal -->
+				<div style="position: relative;">
+					<div id="avisoValidacion" class="modal-aviso">⚠️ Por favor, completa todos los campos</div>
+					<button type="submit">GENERAR PROMPT DE PREGUNTAS</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- Ventana modal flotante para mostrar el prompt generado -->
+		<div id="modalPrompt" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+			<div class="modal-contenido">
+				<h2 id="modalTitulo" class="sr-only">Prompt generado</h2>
+				<!-- Botón para cerrar y volver al formulario -->
+				<button id="modalBotonCerrar" class="modal-boton-cerrar">Cerrar y volver al formulario</button>
+				<a id="modalBotonChatGPT" class="modal-boton-ia" href="#" target="_blank" rel="noopener noreferrer">ABRIR EN CHATGPT</a>
+				<!-- Botón para copiar el prompt generado -->
+				<button id="modalBotonCopiar" class="modal-boton-ia">COPIAR PROMPT GENERADO</button>
+
+				<!-- Texto con el prompt -->
+				<output id="modalResultado" aria-live="polite"></output>
+			</div>
+		</div>
+	</main>
+
+	<script>
+		// ============================
+		// DATOS (data.js integrado)
+		// ============================
+		const temas = {
+			'FILOSOFÍA': {
+				'Fundamentos y Análisis de Textos': [
+					'Conceptos filosóficos básicos',
+					'Corrientes de pensamiento filosófico',
+					'Argumentación filosófica',
+					'Interpretación de textos filosóficos clásicos'
+				],
+				'Filosofía Antigua y Medieval': [
+					'Presocráticos y el origen de la physis',
+					'Sócrates y el método dialéctico',
+					'Platón: Teoría de las Ideas y el Estado',
+					'Aristóteles: Metafísica, Ética y Lógica',
+					'San Agustín: La Ciudad de Dios y el tiempo',
+					'Santo Tomás: Razón y Fe'
+				],
+				'Filosofía Moderna': [
+					'Descartes y el Racionalismo',
+					'Hume y el Empirismo',
+					'Kant y el Idealismo Trascendental',
+					'Hobbes, Locke y el Contrato Social',
+					'Hegel y la Dialéctica'
+				],
+				'Filosofía Contemporánea': [
+					'Nietzsche: El superhombre y el nihilismo',
+					'Existencialismo: Sartre y Heidegger',
+					'Marxismo y Teoría Crítica',
+					'Escuela de Frankfurt',
+					'Foucault: Poder y saber',
+					'Wittgenstein y la Filosofía del Lenguaje'
+				],
+				'Filosofía Política y Social': [
+					'Teorías de justicia y derechos humanos',
+					'El problema del poder y el Estado',
+					'Democracia y ciudadanía',
+					'Ética pública y política'
+				],
+				'Lógica y Epistemología': [
+					'Lógica proposicional y silogismos',
+					'Falacias argumentativas',
+					'El problema del conocimiento',
+					'Filosofía de la ciencia (Popper, Kuhn)',
+					'Verdad y justificación',
+					'Filosofía del lenguaje: significado y verdad'
+				],
+				'Ética y Estética': [
+					'Ética de la virtud',
+					'Deontología y Utilitarismo',
+					'Bioética y problemas contemporáneos',
+					'Teorías de la belleza',
+					'El arte y la representación'
+				]
+			},
+			'BIOLOGÍA': {
+				'Célula': [
+					'Estructura celular', 'Procariotas y Eucariotas', 'Célula vegetal', 'Célula hongo', 'Célula animal', 'Organelos', 'Ciclo celular', 'Mitosis', 'Meiosis', 'Transporte celular', 'Comunicaciones celulares', 'Diferenciación celular'
+				],
+				'Genética': [
+					'ADN', 'ARN', 'Herencia', 'Mutaciones', 'Ingeniería genética', 'Biotecnología', 'Genética de poblaciones', 'Genética molecular', 'Árboles genealógicos'
+				],
+				'Ecología': [
+					'Ecosistemas', 'Cadenas alimentarias', 'Biodiversidad', 'Cambio climático', 'Ciclos biogeoquímicos', 'Interacciones ecológicas', 'Conservación ambiental', 'Impacto humano en el medio ambiente', 'Sostenibilidad ecológica'
+				],
+				'Evolución': [
+					'Selección natural', 'Adaptación', 'Especiación', 'Evidencias de la evolución', 'Teorías evolutivas', 'Árboles filogenéticos', 'Radiación adaptativa', 'Extinción y biodiversidad', 'Taxonomía', 'Evolución humana'
+				],
+				'Anatomía y fisiología': [
+					'Sistema circulatorio', 'Sistema linfático', 'Sistema respiratorio', 'Sistema nervioso', 'Sistema digestivo', 'Sistema endocrino', 'Sistema exocrino', 'Sistema inmunológico', 'Sistema reproductor masculino', 'Sistema reproductor femenino', 'Sistema excretor', 'Sistema muscular', 'Sistema esquelético', 'Homeostasis'
+				],
+				'Microbiología': [
+					'Virus', 'Bacterias', 'Hongos', 'Protozoos', 'Inmunología', 'Patogénesis', 'Antibióticos y resistencia', 'Biotecnología microbiana', 'Ecología microbiana'
+				],
+				'Biología celular y molecular': [
+					'Metabolismo celular', 'Respiración celular', 'Fotosíntesis', 'Señalización celular', 'Biología de membranas', 'Reparación del ADN', 'Expresión génica', 'Ingeniería de proteínas', 'Biología estructural'
+				],
+				'Botánica': [
+					'Morfología vegetal', 'Tipos de tejidos vegetales', 'Fisiología vegetal', 'Reproducción de plantas', 'Fotosíntesis', 'Taxonomía vegetal', 'Plantas medicinales', 'Ecología de plantas', 'Biotecnología vegetal', 'Plantas transgénicas'
+				],
+				'Zoología': [
+					'Anatomía comparada', 'Tipos de tejidos animales', 'Fisiología animal', 'Comportamiento animal', 'Reproducción animal', 'Taxonomía animal', 'Ecología animal', 'Conservación de especies', 'Etología', 'Animales en peligro de extinción'
+				],
+				'Biología, Tecnología y Sociedad (BTS)': [
+					'Impacto de la ciencia y la tecnología en la sociedad', 'Interdisciplinariedad de la BTS en ciencias naturales', 'Temáticas globales y locales en BTS', 'Desarrollo de habilidades a través de BTS', 'Responsabilidad cívica y ciencia y tecnología', 'Historia y filosofía de la ciencia y la tecnología', 'Innovación y emprendimiento en BTS', 'BTS y medio ambiente', 'BTS en la era de la información', 'Bioética y avances biomédicos'
+				]
+			},
+			'QUÍMICA': {
+				'Estructura atómica': [
+					'Modelos atómicos', 'Partículas subatómicas', 'Isótopos', 'Configuración electrónica', 'Número atómico y masa atómica', 'Energía de ionización', 'Electronegatividad', 'Radio atómico y radio iónico', 'Orbitales atómicos'
+				],
+				'Tabla periódica': [
+					'Grupos y periodos', 'Propiedades periódicas', 'Metales y no metales', 'Elementos de transición', 'Elementos representativos', 'Lantánidos y actínidos', 'Historial de la tabla periódica', 'Tendencias periódicas', 'Bloques de la tabla periódica'
+				],
+				'Enlaces químicos': [
+					'Enlace iónico', 'Enlace covalente', 'Enlace metálico', 'Fuerzas intermoleculares', 'Enlace covalente polar y no polar', 'Teoría de la repulsión de pares electrónicos', 'Geometría molecular', 'Teoría del enlace de valencia', 'Hibridación de orbitales'
+				],
+				'Reacciones químicas': [
+					'Tipos de reacciones', 'Estequiometría', 'Equilibrio químico', 'Cinética química', 'Reacciones ácido-base', 'Redox y electroquímica', 'Termoquímica', 'Ley de conservación de la masa', 'Reacciones de precipitación'
+				],
+				'Química orgánica': [
+					'Hidrocarburos', 'Grupos funcionales', 'Isomería', 'Polímeros', 'Reacciones orgánicas', 'Química de compuestos aromáticos', 'Química de carbohidratos', 'Lípidos y proteínas', 'Síntesis orgánica'
+				],
+				'Química inorgánica': [
+					'Compuestos iónicos', 'Compuestos covalentes', 'Ácidos y bases', 'Sales', 'Oxidos y peróxidos', 'Compuestos de coordinación', 'Química de metales y no metales', 'Química de los gases', 'Solubilidad y productos de solubilidad'
+				],
+				'Química analítica': [
+					'Métodos de análisis cualitativo', 'Métodos de análisis cuantitativo', 'Gravimetría', 'Volumetría', 'Espectroscopía', 'Cromatografía', 'Electroforesis', 'Análisis instrumental', 'Química ambiental'
+				],
+				'Bioquímica': [
+					'Carbohidratos', 'Lípidos', 'Aminoácidos y proteínas', 'Ácidos nucleicos', 'Metabolismo y bioenergética', 'Enzimas', 'Vitaminas y coenzimas', 'Ciclos bioquímicos', 'Regulación metabólica'
+				],
+				'Fisicoquímica': [
+					'Termodinámica', 'Cinemática', 'Dinámica de fluidos', 'Electroquímica', 'Fenómenos de superficie', 'Estados de la materia', 'Teoría de colisiones', 'Mecánica cuántica', 'Espectroscopía molecular'
+				],
+				'Química, Tecnología y Sociedad (QTS)': [
+					'Impacto de la ciencia y la tecnología en la sociedad', 'Interdisciplinariedad de la QTS en ciencias naturales', 'Temáticas globales y locales en QTS', 'Desarrollo de habilidades a través de QTS', 'Responsabilidad cívica y ciencia y tecnología', 'Historia y filosofía de la ciencia y la tecnología', 'Innovación y emprendimiento en QTS', 'QTS y medio ambiente', 'QTS en la era de la información', 'Bioética y avances biomédicos'
+				]
+			},
+			'FÍSICA': {
+				'Mecánica': [
+					'Cinemática', 'Dinámica', 'Estática', 'Leyes de Newton', 'Trabajo y energía', 'Momentum y colisiones', 'Movimiento circular y rotacional', 'Gravitación', 'Fluidos', 'Oscilaciones y ondas', 'Mecánica de sólidos'
+				],
+				'Termodinámica': [
+					'Calor y temperatura', 'Leyes de la termodinámica', 'Procesos termodinámicos', 'Entropía', 'Máquinas térmicas', 'Teoría cinética de los gases', 'Energía interna', 'Capacidad calorífica', 'Transferencia de calor', 'Estados de la materia'
+				],
+				'Ondas': [
+					'Ondas mecánicas', 'Ondas electromagnéticas', 'Sonido', 'Óptica', 'Interferencia y difracción', 'Polarización', 'Efecto Doppler', 'Resonancia', 'Espectroscopía', 'Ondas estacionarias'
+				],
+				'Electricidad y magnetismo': [
+					'Electrostática', 'Circuitos eléctricos', 'Campo magnético', 'Inducción electromagnética', 'Ley de Coulomb', 'Ley de Gauss', 'Ley de Ampère', 'Ley de Faraday', 'Leyes de Kirchhoff', 'Electrónica básica', 'Electromagnetismo'
+				],
+				'Física moderna': [
+					'Teoría de la relatividad', 'Mecánica cuántica', 'Física nuclear', 'Física de partículas', 'Dualidad onda-partícula', 'Modelo estándar de partículas', 'Fusión y fisión nuclear', 'Rayos cósmicos', 'Astrofísica', 'Cosmología', 'Teoría del Big Bang'
+				],
+				'Óptica y fotónica': [
+					'Reflexión y refracción', 'Lentes y espejos', 'Instrumentos ópticos', 'Interferencia y difracción', 'Fibra óptica', 'Polarización de la luz', 'Lasers y fotónica', 'Dispositivos ópticos', 'Óptica cuántica', 'Interferometría', 'Holografía', 'Espectroscopía óptica'
+				],
+				'Física de materiales': [
+					'Propiedades mecánicas', 'Propiedades térmicas', 'Propiedades eléctricas', 'Propiedades magnéticas', 'Materiales conductores y semiconductores', 'Materiales compuestos', 'Nanoestructuras', 'Cristalografía', 'Física de superficies', 'Física de superconductores'
+				],
+				'Física, Tecnología y Sociedad (FTS)': [
+					'Impacto de la ciencia y la tecnología en la sociedad', 'Interdisciplinariedad de la FTS en ciencias naturales', 'Temáticas globales y locales en FTS', 'Desarrollo de habilidades a través de FTS', 'Responsabilidad cívica y ciencia y tecnología', 'Historia y filosofía de la ciencia y la tecnología', 'Innovación y emprendimiento en FTS', 'FTS y medio ambiente', 'FTS en la era de la información', 'Bioética y avances biomédicos'
+				]
+			},
+			'MATEMÁTICAS': {
+				'Aritmética': [
+					'Operaciones básicas', 'Números enteros y racionales', 'Fracciones y decimales', 'Potencias y raíces', 'Proporcionalidad y porcentajes', 'Notación científica', 'Divisibilidad y factorización', 'Números primos y compuestos', 'Sistemas de numeración'
+				],
+				'Conjuntos': [
+					'Definición y notación de conjuntos', 'Operaciones con conjuntos', 'Diagramas de Venn', 'Conjuntos numéricos', 'Propiedades de los conjuntos', 'Cardinalidad', 'Conjuntos infinitos', 'Álgebra de conjuntos', 'Aplicaciones de la teoría de conjuntos'
+				],
+				'Razonamiento cuantitativo': [
+					'Interpretación de datos', 'Resolución de problemas', 'Modelado matemático', 'Lógica matemática', 'Estimación y aproximación', 'Proporcionalidad', 'Conversión de unidades', 'Análisis dimensional', 'Pensamiento algorítmico'
+				],
+				'Álgebra': [
+					'Ecuaciones lineales y sistemas', 'Funciones y gráficas', 'Polinomios y factorización', 'Sistemas de ecuaciones', 'Ecuaciones cuadráticas', 'Desigualdades', 'Funciones exponenciales y logarítmicas', 'Matrices y determinantes', 'Teoría de números', 'Números complejos', 'Sucesiones y series', 'Funciones trigonométricas'
+				],
+				'Geometría': [
+					'Geometría plana', 'Paralelismo y ortogonalidad entre rectas', 'Trigonometría', 'Geometría analítica', 'Transformaciones geométricas', 'Vectores en el plano y espacio', 'Cónicas y cilindros', 'Geometría del espacio', 'Geometría no euclidiana', 'Teoremas de la geometría', 'Figuras geométricas', 'Propiedades de los triángulos', 'Desigualdad triangular', 'Propiedades de los círculos', 'Paralelogramos', 'Paralelepípedos rectos', 'Teorema de Pitágoras', 'Teorema de Tales', 'Coordenadas polares y cartesianas', 'Relaciones de congruencia y semejanza', 'Transformaciones en el plano', 'Lugares geométricos'
+				],
+				'Trigonometría': [
+					'Funciones trigonométricas', 'Identidades trigonométricas', 'Ecuaciones trigonométricas', 'Ley de senos y cosenos', 'Ángulos y sus medidas', 'Gráficas de funciones trigonométricas', 'Aplicaciones de la trigonometría', 'Vectores y sus aplicaciones', 'Funciones inversas y sus propiedades'
+				],
+				'Cálculo': [
+					'Límites y continuidad', 'Derivadas', 'Aplicaciones de la derivada', 'Integrales', 'Aplicaciones de la integral', 'Ecuaciones diferenciales', 'Series de Taylor', 'Cálculo vectorial', 'Optimización', 'Teoremas fundamentales del cálculo'
+				],
+				'Estadística y probabilidad': [
+					'Estadística descriptiva', 'Probabilidad básica', 'Distribuciones de probabilidad', 'Permutaciones', 'Combinaciones', 'Inferencia estadística', 'Teorema de Bayes', 'Regresión y correlación', 'Análisis de datos', 'Análisis de varianza y percentiles', 'Muestreo y estimación', 'Pruebas de hipótesis', 'Estadística no paramétrica'
+				],
+				'Matemática discreta': [
+					'Lógica matemática', 'Combinatoria', 'Teoría de grafos', 'Teoría de números', 'Algoritmos y complejidad', 'Álgebra booleana', 'Teoría de la computación', 'Criptografía', 'Relaciones y funciones discretas'
+				],
+				'Álgebra lineal': [
+					'Espacios vectoriales', 'Transformaciones lineales', 'Sistemas de ecuaciones lineales', 'Valores y vectores propios', 'Diagonalización', 'Formas cuadráticas', 'Espacios con producto interno', 'Aplicaciones a la geometría', 'Álgebra lineal numérica'
+				],
+				'Matemáticas financieras': [
+					'Interés simple y compuesto', 'Anualidades', 'Amortización', 'Valoración de bonos', 'Análisis de inversiones', 'Matemáticas del mercado de valores', 'Modelos financieros', 'Riesgo y diversificación', 'Derivados financieros'
+				],
+				'Matemáticas aplicadas': [
+					'Modelado matemático', 'Optimización', 'Teoría de juegos', 'Investigación de operaciones', 'Matemáticas en la física', 'Biomatemática', 'Matemáticas en la ingeniería', 'Matemáticas en la economía', 'Matemáticas computacionales'
+				],
+				'Historia y fundamentos de las matemáticas': [
+					'Historia de las matemáticas', 'Filosofía de las matemáticas', 'Lógica y teoría de conjuntos', 'Axiomas y sistemas formales', 'Teoremas fundamentales', 'Paradojas matemáticas', 'Conjeturas famosas', 'Matemáticos notables', 'Evolución del pensamiento matemático'
+				]
+			},
+			'COMPETENCIAS CIUDADANAS': {
+				'Conocimientos cívicos y políticos': [
+					'Constitución política de Colombia', 'Estructura del Estado colombiano', 'Derechos humanos y fundamentales', 'Deberes y responsabilidades ciudadanas', 'Organización y funcionamiento del gobierno', 'Mecanismos de participación ciudadana', 'Sistema judicial y Estado de Derecho', 'Políticas públicas y su impacto', 'Historia política y cívica nacional', 'Sistemas políticos comparados', 'Relaciones internacionales y organismos multilaterales'
+				],
+				'Argumentación y pensamiento crítico': [
+					'Análisis de perspectivas y fuentes de información', 'Construcción de argumentos y contrargumentos', 'Evaluación de la validez y solidez de argumentos', 'Identificación y análisis de falacias lógicas', 'Técnicas de debate y oratoria', 'Pensamiento lógico y razonamiento', 'Análisis crítico de medios de comunicación', 'Fact-checking y verificación de información', 'Ética en la argumentación', 'Retórica y persuasión responsable'
+				],
+				'Multiperspectivismo y diversidad': [
+					'Análisis de conflictos sociales y políticos', 'Diversidad cultural, étnica y religiosa', 'Perspectivas de género y orientación sexual', 'Interpretación de fenómenos sociales complejos', 'Contextos históricos y su influencia en el presente', 'Globalización y sus efectos en la diversidad', 'Inclusión y equidad social', 'Interculturalidad y diálogo entre culturas', 'Relativismo cultural vs. universalismo', 'Migración y sus impactos sociales'
+				],
+				'Pensamiento sistémico y análisis social': [
+					'Identificación de causas y consecuencias en problemas sociales', 'Interrelaciones entre sistemas económicos, políticos y sociales', 'Análisis de sistemas complejos en la sociedad', 'Dimensiones de la reality social: local, nacional y global', 'Sostenibilidad y desarrollo humano integral', 'Teoría de sistemas aplicada a fenómenos sociales', 'Análisis de políticas públicas y su impacto sistémico', 'Prospectiva y escenarios futuros', 'Interdependencia global y efectos cascada', 'Resiliencia social y adaptación al cambio'
+				],
+				'Competencias emocionales y sociales': [
+					'Desarrollo de la empatía y compasión', 'Inteligencia emocional y autorregulación', 'Técnicas de escucha activa y comunicación asertiva', 'Resolución pacífica de conflictos', 'Negociación, mediación y construcción de consensos', 'Trabajo en equipo y colaboración', 'Liderazgo ético y servicio comunitario', 'Resiliencia y manejo del estrés', 'Toma de decisiones éticas', 'Construcción de relaciones interpersonales saludables'
+				],
+				'Participación ciudadana y acción social': [
+					'Diseño y gestión de proyectos comunitarios', 'Voluntariado y servicio social', 'Activismo digital y participación en línea', 'Organización de movimientos sociales', 'Participación en procesos electorales', 'Incidencia en políticas públicas', 'Veeduría ciudadana y control social', 'Emprendimiento social y economía solidaria', 'Participación en organizaciones de la sociedad civil', 'Diplomacia ciudadana y cooperación internacional'
+				],
+				'Ética y valores cívicos': [
+					'Fundamentos de la ética cívica', 'Valores democráticos y republicanos', 'Responsabilidad social y ambiental', 'Integridad y lucha contra la corrupción', 'Ética del cuidado y solidaridad', 'Justicia social y equidad', 'Tolerancia y respeto a la diversidad', 'Patriotismo crítico y constructivo', 'Ética de la información y uso responsable de redes sociales', 'Dilemas éticos en la vida pública'
+				],
+				'Alfabetización mediática y digital': [
+					'Análisis crítico de medios de comunicación', 'Creación de contenido digital responsable', 'Seguridad y privacidad en línea', 'Ciudadanía digital y netiqueta', 'Desinformación, fake news y propaganda', 'Big data y su impacto en la democracia', 'Alfabetización en redes sociales', 'Uso ético de la tecnología', 'Brecha digital y acceso a la información', 'Innovación tecnológica y participación ciudadana'
+				],
+				'Sostenibilidad y conciencia global': [
+					'Objetivos de Desarrollo Sostenible (ODS)', 'Cambio climático y acción ciudadana', 'Consumo responsable y economía circular', 'Biodiversidad y conservation', 'Justicia ambiental y ecología social', 'Energías renovables y transición energética', 'Seguridad alimentaria y agricultura sostenible', 'Ciudades sostenibles e inteligentes', 'Cooperación internacional para el desarrollo sostenible', 'Educación para el desarrollo sostenible'
+				],
+				'Derechos humanos y justicia': [
+					'Historia y evolución de los derechos humanos', 'Sistemas de protección de derechos humanos', 'Violaciones de derechos humanos y su denuncia', 'Derechos de grupos vulnerables y minorías', 'Justicia transicional y construcción de paz', 'Derecho internacional humanitario', 'Acceso a la justicia y debido proceso', 'Reforma del sistema de justicia', 'Justicia restaurativa y alternativa', 'Derechos digitales y privacidad'
+				]
+			},
+			'LECTURA CRÍTICA': {
+				'Comprensión literal': [
+					'Identificación de información explícita y detalles específicos en el texto', 'Paráfrasis y reformulación de ideas principales y secundarias', 'Síntesis de textos: condensación de información clave sin perder significado', 'Análisis de vocabulario en contexto: comprensión y aplicación de palabras clave', 'Localización de detalles relevantes para la comprensión global del texto', 'Identificación de la estructura del texto: introducción, desarrollo y conclusión', 'Uso de técnicas de lectura rápida y eficiente para mejorar la comprensión', 'Aplicación de estrategias de comprensión activa: subrayado, resumen y esquematización', 'Interpretación de gráficos, tablas y otros elementos visuales en textos informativos'
+				],
+				'Inferencia textual': [
+					'Deducciones lógicas basadas en información explícita', 'Identificación de relaciones implícitas entre ideas y conceptos', 'Interpretación de la intención del autor a través del texto', 'Formulación de conclusiones basadas en el análisis del texto', 'Análisis de metáforas, simbolismos y figuras retóricas', 'Inferencia cultural y contextual: comprensión del texto dentro de su contexto histórico y cultural', 'Identificación de mensajes subyacentes y temas recurrentes en el texto', 'Aplicación de inferencias textuales en la resolución de problemas y situaciones hipotéticas', 'Comparación de múltiples interpretaciones posibles del texto', 'Crítica interpretativa: evaluación de la validez y coherencia de las inferencias realizadas'
+				],
+				'Análisis crítico': [
+					'Identificación de argumentos principales y secundarios', 'Evaluación de la coherencia y la consistencia del argumento', 'Reconocimiento de fallacias lógicas y argumentativas', 'Comparación de diferentes puntos de vista y perspectivas', 'Análisis de la estructura del texto y la organización del contenido', 'Interpretación de intenciones del autor y tono del texto', 'Valoración de la relevancia y la actualidad del tema tratado', 'Crítica literaria: análisis de la forma y el contenido de textos literarios', 'Crítica cultural: análisis de textos en relación con el contexto social y cultural', 'Crítica académica: evaluación de textos académicos en términos de rigor y metodología'
+				],
+				'Tipos de texto': [
+					'Textos literarios', 'Textos informativos', 'Textos argumentativos', 'Textos expositivos', 'Textos descriptivos', 'Textos narrativos', 'Textos científicos', 'Textos periodísticos'
+				],
+				'Textos literarios': [
+					'Análisis de narrativa: estructura y desarrollo de la trama', 'Interpretación de poesía: métrica, simbolismo y estilo', 'Elementos estilísticos: uso del lenguaje, metáforas y símbolos', 'Contexto histórico-literario: influencias y movimientos literarios', 'Análisis de personajes: desarrollo, motivaciones y relaciones', 'Géneros literarios: novela, cuento, drama y ensayo literario', 'Literatura universal: obras y autores destacados a nivel mundial', 'Literatura hispanoamericana: obras y autores representativos', 'Literatura contemporánea: tendencias y nuevas formas de expresión literaria', 'Recepción crítica: interpretación y valoración personal de obras literarias'
+				],
+				'Textos científicos': [
+					'Metodología científica: observación, experimentación, y análisis de datos', 'Interpretación de datos experimentales y observacionales', 'Hipótesis científicas: formulación y prueba', 'Teorías científicas: desarrollo y corroboración', 'Divulgación científica: comunicación clara y accesible de descubrimientos científicos', 'Aplicación de conceptos científicos en la vida cotidiana', 'Historia de la ciencia: evolución de las ideas científicas a lo largo del tiempo', 'Ética en la investigación científica y responsabilidad social', 'Interacción entre ciencia, tecnología y sociedad', 'Avances científicos contemporáneos y sus implicaciones'
+				]
+			},
+			'GEOGRAFÍA': {
+				'Geografía física': [
+					'Geomorfología', 'Climatología', 'Hidrografía', 'Biogeografía', 'Geología', 'Edafología', 'Oceanografía', 'Glaciología', 'Procesos geomorfológicos', 'Geografía de desastres naturales'
+				],
+				'Geografía humana': [
+					'Demografía', 'Geografía urbana', 'Geografía rural', 'Geografía económica', 'Geografía cultural', 'Geografía política', 'Geografía de la salud', 'Geografía del turismo', 'Geografía de la religión'
+				],
+				'Cartografía y técnicas geográficas': [
+					'Sistemas de Información Geográfica (SIG)', 'Teledetección', 'GPS y sistemas de navegación', 'Fotointerpretación', 'Elaboración de mapas', 'Escalas y proyecciones', 'Topografía', 'Estadística espacial', 'Modelado geográfico'
+				],
+				'Geografía de Colombia': [
+					'Regiones naturales', 'División política', 'Recursos naturales', 'Biodiversidad', 'Zonas climáticas de Colombia', 'Ecosistemas colombianos', 'Impactos ambientales', 'Desarrollo regional', 'Geografía económica de Colombia'
+				],
+				'Geografía de América Latina': [
+					'Regiones geográficas', 'Recursos naturales', 'Ecosistemas', 'Patrones de población', 'Movimientos migratorios', 'Geografía económica', 'Integración regional', 'Desafíos ambientales', 'Impactos de la globalización'
+				],
+				'Geografía regional': [
+					'Geografía de América', 'Geografía de Europa', 'Geografía de Asia', 'Geografía de África', 'Geografía de Oceanía', 'Geografía de la Antártida', 'Geografía del Ártico', 'Geografía de los océanos', 'Estudios regionales comparativos'
+				],
+				'Medio ambiente y desarrollo sostenible': [
+					'Cambio climático global', 'Conservación de ecosistemas', 'Gestión de recursos naturales', 'Energías renovables', 'Contaminación y manejo de residuos', 'Desarrollo urbano sostenible', 'Agricultura sostenible', 'Políticas ambientales', 'Educación ambiental'
+				],
+				'Economía': [
+					'Conceptos económicos básicos', 'Microeconomía', 'Macroeconomía', 'Política económica', 'Comercio internacional', 'Desarrollo económico', 'Sistema financiero', 'Economía colombiana', 'Indicadores económicos'
+				],
+				'Geografía económica y recursos': [
+					'Geografía industrial', 'Geografía agrícola', 'Geografía de los servicios', 'Geografía del transporte', 'Comercio internacional', 'Geografía de los recursos energéticos', 'Geografía de los recursos hídricos', 'Geografía de los recursos minerales', 'Geografía del desarrollo'
+				],
+				'Geopolítica y relaciones internacionales': [
+					'Fronteras y límites', 'Organizaciones internacionales', 'Conflictos territoriales', 'Geografía electoral', 'Movimientos migratorios', 'Globalización', 'Bloques económicos', 'Geografía del terrorismo', 'Geografía de la cooperación internacional'
+				],
+				'Geografía de la población': [
+					'Distribución de la población mundial', 'Crecimiento demográfico', 'Estructura de la población', 'Migraciones', 'Urbanización', 'Geografía del envejecimiento', 'Geografía de la pobreza', 'Geografía de género', 'Geografía de las minorías étnicas'
+				],
+				'Geografía histórica': [
+					'Evolución de los paisajes', 'Geografía de las civilizaciones antiguas', 'Geografía de la colonización', 'Geografía de las revoluciones industriales', 'Geografía de las guerras mundiales', 'Geografía de la descolonización', 'Geografía de la Guerra Fría', 'Geografía de la globalización', 'Geografía de los descubrimientos'
+				]
+			},
+			'HISTORIA': {
+				'Prehistoria': [
+					'Paleolítico', 'Mesolítico', 'Neolítico', 'Edad de los Metales', 'Evolución humana', 'Arte rupestre', 'Primeras herramientas', 'Domesticación de plantas y animales', 'Surgimiento de las primeras civilizaciones'
+				],
+				'Antiguas civilizaciones': [
+					'Mesopotamia', 'Antiguo Egipto', 'Antigua Grecia', 'Imperio Romano', 'Antigua China', 'Civilización del Valle del Indo', 'Antigua Persia', 'Fenicios y cartagineses', 'Civilizaciones precolombinas', 'Civilización Maya', 'Civilización Inca', 'Civilización Azteca'
+				],
+				'Edad Media': [
+					'Alta Edad Media', 'Baja Edad Media', 'Feudalismo', 'Cruzadas', 'Imperio Bizantino', 'Reinos medievales', 'Expansión del Islam medieval', 'Renacimiento carolingio', 'La Peste Negra', 'Guerras de los Cien Años', 'Cultura y sociedad medieval', 'Economía medieval'
+				],
+				'Edad Moderna': [
+					'Renacimiento', 'Reforma y Contrarreforma', 'Descubrimientos geográficos', 'Colonización de América', 'Absolutismo', 'Ilustración', 'Revoluciones burguesas', 'Revolución Industrial', 'Independencias americanas'
+				],
+				'Edad Contemporánea': [
+					'Revolución Francesa', 'Guerras napoleónicas', 'Imperialismo', 'Crisis económicas', 'Primera Guerra Mundial', 'Revolución Rusa', 'Período de entreguerras', 'Segunda Guerra Mundial', 'Guerra Fría', 'Descolonización'
+				],
+				'Historia reciente': [
+					'Caída del Muro de Berlín', 'Fin de la URSS', 'Globalización', 'Terrorismo internacional', 'Crisis económica de 2008', 'Primavera Árabe', 'Cambio climático', 'Revolución digital', 'Pandemia de COVID-19'
+				],
+				'Historia de Colombia': [
+					'Conquista y colonización', 'Independencia', 'República', 'Guerras civiles', 'La Violencia', 'Frente Nacional', 'Conflicto armado contemporáneo', 'Procesos de paz', 'Desarrollo económico y social'
+				],
+				'Historia de América Latina': [
+					'Civilizaciones precolombinas', 'Conquista y colonización', 'Independencia de las naciones latinoamericanas', 'Revoluciones y dictaduras', 'Integración regional', 'Movimientos sociales', 'Desarrollo económico y social', 'Relaciones internacionales', 'Cultura y sociedad'
+				],
+				'Historia social y cultural': [
+					'Historia de las religiones', 'Historia del arte', 'Historia de la ciencia', 'Historia de la tecnología', 'Historia de las mujeres', 'Historia de las minorías', 'Historia de la vida cotidiana', 'Historia de las ideas', 'Historia de los movimientos sociales'
+				],
+				'Historia económica': [
+					'Sistemas económicos', 'Revoluciones industriales', 'Historia del comercio', 'Crisis económicas', 'Desarrollo del capitalismo', 'Historia de la banca', 'Globalización económica', 'Historia de la agricultura', 'Historia de la energía'
+				],
+				'Historia militar': [
+					'Estrategia y tácticas', 'Grandes batallas', 'Evolución del armamento', 'Guerras mundiales', 'Guerras civiles', 'Guerras de independencia', 'Conflictos del siglo XX', 'Guerras asimétricas', 'Carrera armamentística'
+				],
+				'Historiografía y métodos históricos': [
+					'Fuentes históricas', 'Arqueología', 'Cronología', 'Escuelas historiográficas', 'Historia oral', 'Análisis de documentos', 'Interdisciplinariedad en la historia', 'Historia digital', 'Ética en la investigación histórica'
+				]
+			},
+			'INGLÉS': {
+				'A1 - Principiante': [
+					'Palabras y frases muy básicas', 'Nombres de objetos cotidianos', 'Números y fechas simples', 'Información personal básica', 'Señales y carteles comunes', 'Instrucciones muy simples', 'Mensajes cortos y sencillos', 'Postales breves', 'Formularios simples'
+				],
+				'A2 - Elemental': [
+					'Textos cortos y sencillos', 'Descripciones breves', 'Anuncios y folletos simples', 'Menús y horarios', 'Cartas personales breves', 'Emails informales cortos', 'Instrucciones básicas', 'Artículos de revistas simples', 'Historias cortas adaptadas'
+				],
+				'B1 - Intermedio': [
+					'Textos de longitud media', 'Artículos de periódicos sencillos', 'Cartas personales que describen eventos', 'Instrucciones de uso de aparatos', 'Textos argumentativos simples', 'Historias cortas originales', 'Biografías breves', 'Reseñas sencillas de películas o libros', 'Entradas de blog'
+				],
+				'Estrategias de lectura': [
+					'Identificación de ideas principales', 'Comprensión de vocabulario por contexto', 'Skimming (lectura rápida para idea general)', 'Scanning (buscar información específica)', 'Predicción del contenido', 'Uso de conocimientos previos', 'Inferencia de significados', 'Reconocimiento de conectores básicos', 'Comprensión de la estructura del texto'
+				],
+				'Temas comunes': [
+					'Vida cotidiana', 'Familia y amigos', 'Trabajo y estudios', 'Tiempo libre y ocio', 'Viajes y transporte', 'Comida y bebida', 'Compras', 'Salud y bienestar', 'Tecnología básica'
+				],
+				'Tipos de textos': [
+					'Narrativos simples', 'Descriptivos básicos', 'Informativos breves', 'Instruccionales sencillos', 'Diálogos cotidianos', 'Cartas y emails', 'Anuncios y publicidad', 'Artículos cortos', 'Entradas de redes sociales'
+				],
+				'Gramática en contexto': [
+					'Tiempos verbales básicos', 'Estructuras de oraciones simples', 'Adjetivos y adverbios comunes', 'Preposiciones de tiempo y lugar', 'Pronombres personales y posesivos', 'Artículos definidos e indefinidos', 'Comparativos y superlativos simples', 'Verbos modales básicos', 'Conectores simples'
+				],
+				'Vocabulario': [
+					'Palabras de alta frecuencia', 'Expresiones idiomáticas simples', 'Colocaciones básicas', 'Prefijos y sufijos comunes', 'Sinónimos y antónimos básicos', 'Vocabulario temático', 'Phrasal verbs simples', 'Falsos amigos comunes', 'Abreviaturas y acrónimos frecuentes'
+				],
+				'Evaluación de la comprensión': [
+					'Preguntas de verdadero/falso', 'Preguntas de opción múltiple', 'Ejercicios de completar huecos', 'Ordenar párrafos o eventos', 'Relacionar títulos con párrafos', 'Responder preguntas abiertas simples', 'Resumir ideas principales', 'Identificar el propósito del texto', 'Reconocer el tono y registro básico'
+				]
+			}
+		};
+
+		// ============================
+		// LÓGICA (main.js integrado)
+		// ============================
+		const elementos = {
+			materia: document.getElementById('materia'),
+			temaPrincipal: document.getElementById('temaPrincipal'),
+			subtema: document.getElementById('subtema'),
+			nivelDificultad: document.getElementById('nivelDificultad'),
+			nivelDetalle: document.getElementById('nivelDetalle'),
+			formulario: document.getElementById('formularioPrompt'),
+			modal: document.getElementById('modalPrompt'),
+			modalResultado: document.getElementById('modalResultado'),
+			modalBotonChatGPT: document.getElementById('modalBotonChatGPT'),
+			modalBotonCerrar: document.getElementById('modalBotonCerrar'),
+			modalBotonCopiar: document.getElementById('modalBotonCopiar'),
+			avisoValidacion: document.getElementById('avisoValidacion')
+		};
+
+		function generarPrompt(datos) {
+			let promptMateria = '';
+			switch (datos.valorMateria) {
+				case "LECTURA CRÍTICA":
+					promptMateria = `\nCompetencia 1 - Identificar y entender los contenidos locales que conforman un texto: Entender el significado de palabras, frases y fragmentos breves en su contexto inmediato.\nCompetencia 2 - Comprender cómo se articulan las partes de un texto para darle un sentido global: Identificar la estructura interna, idea central y relación lógica entre párrafos.\nCompetencia 3 - Reflexionar a partir de un texto y evaluar su contenido: Análisis crítico, intención del autor, estrategias retóricas y validez de argumentos.`;
+					break;
+				case "FILOSOFÍA":
+					promptMateria = `\nCompetencia 1 - Reconocimiento de conceptos y tesis: Identificación de términos técnicos y la posición central del filósofo.\nCompetencia 2 - Análisis de relaciones lógicas: Comprender el paso de las premisas a la conclusión, identificar conectores argumentativos y la función de analogías.\nCompetencia 3 - Diálogo dialéctico y crítico: Identificar supuestos implícitos, evaluar la solidez de la tesis frente a contraargumentos y situar el problema en la historia de las ideas.`;
+					break;
+				case "MATEMÁTICAS":
+					promptMateria = `\nCompetencia 1 - Interpretación y representación: Capacidad de comprender y transformar información presentada en diversos formatos. Incluye extracción de información e identificación de patrones.\nCompetencia 2 - Formulación y ejecución: Capacidad de plantear estrategias para resolver problemas.\nCompetencia 3 - Argumentación: Capacidad de validar o refutar conclusiones mediante justificaciones.`;
+					break;
+				case "BIOLOGÍA":
+					promptMateria = `\nCompetencia 1 - Uso comprensivo del conocimiento científico: Comprender conceptos biológicos.\nCompetencia 2 - Explicación de fenómenos: Construir explicaciones basadas en observaciones.\nCompetencia 3 - Indagación: Comprender cómo se construye el conocimiento a partir de la investigación científica.`;
+					break;
+				case "QUÍMICA":
+					promptMateria = `\nCompetencia 1 - Uso comprensivo del conocimiento científico: Comprender conceptos químicos.\nCompetencia 2 - Explicación de fenómenos: Explicar fenómenos como reacciones o pH.\nCompetencia 3 - Indagación: Comprender el diseño experimental y leyes de conservación.`;
+					break;
+				case "FÍSICA":
+					promptMateria = `\nCompetencia 1 - Uso comprensivo del conocimiento científico: Comprender conceptos de cinemática, dinámica, etc.\nCompetencia 2 - Explicación de fenómenos: Razón de fenómenos físicos.\nCompetencia 3 - Indagación: Identificación de variables y diseño experimental.`;
+					break;
+				case "COMPETENCIAS CIUDADANAS":
+					promptMateria = `\nCompetencia 1 - Pensamiento Social: Conceptos políticos y cívicos.\nCompetencia 2 - Interpretación y Análisis de Perspectivas: Evaluar intenciones y prejuicios.\nCompetencia 3 - Pensamiento Reflexivo y Sistémico: Analizar problemas multidimensionales.`;
+					break;
+				case "HISTORIA":
+					promptMateria = `\nCompetencia 1 - Pensamiento Social: Procesos históricos y su relevancia.\nCompetencia 2 - Interpretación y Análisis de Perspectivas: Fuentes primarias en su contexto.\nCompetencia 3 - Pensamiento Reflexivo y Sistémico: Relaciones de causalidad.`;
+					break;
+				case "GEOGRAFÍA":
+					promptMateria = `\nCompetencia 1 - Pensamiento Social: Conceptos geográficos y ordenamiento territorial.\nCompetencia 2 - Interpretación y Análisis de Perspectivas: Visiones sobre recursos naturales.\nCompetencia 3 - Pensamiento Reflexivo y Sistémico: Problemas territoriales multidimensionales.`;
+					break;
+				case "INGLÉS":
+					promptMateria = `\nNiveles Pre-A1 a B1. Partes 1 (léxico), 2 (sociolingüístico), 3 (lectura literal), 4 (inferencial) y 5 (gramatical).`;
+					break;
+				default:
+					promptMateria = `Desarrollo de competencias de interpretación, argumentación y proposición.`;
+			}
+
+			let instruccionAnalisis = '';
+			switch (datos.nivelDetalle) {
+				case 'completo':
+					instruccionAnalisis = `Para cada pregunta, DEBES incluir obligatoriamente el siguiente análisis técnico:\n1. **Competencia**\n2. **Afirmación**\n3. **Evidencia**\n4. **Estándar asociado**\n5. **¿Qué evalúa?**\n6. **Justificación de la respuesta correcta**\n7. **Justificación de opciones no válidas**`;
+					break;
+				case 'solo_respuesta':
+					instruccionAnalisis = 'Proporciona la clave de respuestas correcta al final.';
+					break;
+				case 'solo_pregunta':
+					instruccionAnalisis = 'NO proporciones la clave de respuesta ni explicación técnica. Genera únicamente contexto, enunciado y opciones.';
+					break;
+			}
+
+			const requisitosEspeciales = (datos.valorMateria === "LECTURA CRÍTICA") ? `\n- Contexto continuo/discontinuo.\n- Incluya fuente.` : (datos.valorMateria === "FILOSOFÍA") ? `\n- Fragmento de texto filosófico.\n- RECONOCIMIENTO DE TESIS.` : (datos.valorMateria === "COMPETENCIAS CIUDADANAS") ? `\n- Conflictos de intereses reales.\n- Distractores plausibles, no basados en "deber ser".` : (datos.valorMateria === "MATEMÁTICAS") ? `\n- Categoría (Álgebra, Geometría, Estadística).\n- Distractores basados en rutas erróneas.` : '';
+
+			return `Usted es un experto redactor de ítems de evaluación para SABER 11 (Colombia).\nGenera una pregunta para **${datos.valorMateria}**.\n\n**Parámetros:**\n- Tema: ${datos.valorTemaPrincipal}\n- Subtema: ${datos.valorSubtema}\n- Competencia: ${datos.nivelDificultad}\n\n**Lineamientos:**${promptMateria}${requisitosEspeciales}\n\n**Estructura Obligatoria:**\n1. Contexto\n2. Enunciado\n3. Opciones (A, B, C, D)\n\n${instruccionAnalisis}\n\nRigor: Académico, formal, Diseño Centrado en Evidencias.`;
+		}
+
+		function poblarSelect(elementoSelect, opciones, textoDefecto) {
+			elementoSelect.innerHTML = `<option value="">${textoDefecto}</option>`;
+			opciones.forEach(opcion => {
+				const elementoOpcion = document.createElement('option');
+				elementoOpcion.value = opcion;
+				elementoOpcion.textContent = opcion;
+				elementoSelect.appendChild(elementoOpcion);
+			});
+		}
+
+		function actualizarEnlacesIA(prompt) {
+			const promptCodificado = encodeURIComponent(prompt);
+			elementos.modalBotonChatGPT.href = `https://chatgpt.com/?prompt=${promptCodificado}&hints=study`;
+		}
+
+		function copiarAlPortapapeles() {
+			const texto = elementos.modalResultado.textContent;
+			if (navigator.clipboard && window.isSecureContext) {
+				navigator.clipboard.writeText(texto).then(() => {
+					elementos.modalBotonCopiar.textContent = 'PROMPT COPIADO';
+					setTimeout(() => { elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO'; }, 2000);
+				});
+			}
+		}
+
+		elementos.materia.addEventListener('change', function () {
+			const materiaSeleccionada = this.value;
+			poblarSelect(elementos.temaPrincipal, Object.keys(temas[materiaSeleccionada] || {}), 'Selecciona un tema principal');
+			poblarSelect(elementos.subtema, [], 'Primero selecciona un tema principal');
+		});
+
+		elementos.temaPrincipal.addEventListener('change', function () {
+			const materiaSeleccionada = elementos.materia.value;
+			const temaSeleccionado = this.value;
+			poblarSelect(elementos.subtema, temas[materiaSeleccionada]?.[temaSeleccionado] || [], 'Selecciona un subtema');
+		});
+
+		elementos.formulario.addEventListener('submit', function (e) {
+			e.preventDefault();
+			const datosFormulario = {
+				valorMateria: elementos.materia.value,
+				valorTemaPrincipal: elementos.temaPrincipal.value,
+				valorSubtema: elementos.subtema.value,
+				nivelDificultad: elementos.nivelDificultad.value,
+				nivelDetalle: elementos.nivelDetalle.value
+			};
+
+			if (datosFormulario.valorMateria && datosFormulario.valorTemaPrincipal && datosFormulario.valorSubtema && datosFormulario.nivelDificultad && datosFormulario.nivelDetalle) {
+				const prompt = generarPrompt(datosFormulario);
+				elementos.modalResultado.textContent = prompt;
+				actualizarEnlacesIA(prompt);
+				elementos.modal.style.display = 'block';
+			} else {
+				elementos.avisoValidacion.classList.add('visible');
+				setTimeout(() => {
+					elementos.avisoValidacion.classList.remove('visible');
+				}, 3000);
+			}
+		});
+
+		elementos.modalBotonCopiar.addEventListener('click', copiarAlPortapapeles);
+		elementos.modalBotonCerrar.addEventListener('click', () => { elementos.modal.style.display = 'none'; });
+		window.addEventListener('click', (evento) => { if (evento.target == elementos.modal) { elementos.modal.style.display = 'none'; } });
+	</script>
+</body>
+
+</html>
