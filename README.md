@@ -21,10 +21,7 @@ Este es un generador de prompts especializado, diseñado para ayudar a docentes 
 
 ## 📂 Estructura del Proyecto
 
--   `preguntas.html`: Estructura de la aplicación.
--   `style.css`: Estilos visuales y diseño responsivo.
--   `main.js`: Lógica de la aplicación y motor de prompts.
--   `data.js`: Base de datos de materias, temas y subtemas.
+-   `preguntas.html`: Aplicación completa.
 
 ## 📝 Cómo utilizar
 
