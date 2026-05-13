@@ -22,6 +22,7 @@
 			--sombra-caja: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.1);
 			--radio-borde-grande: 10px;
 			--radio-borde-pequeno: 5px;
+			--espaciado-botones-modal: 10px;
 			--transicion-rapida: background-color 0.3s ease, color 0.3s ease;
 			--transicion-transformacion: transform 0.2s ease;
 		}
@@ -130,8 +131,8 @@
 		   Estilos de botones
 		   ============================ */
 
-		button, .modal-boton-ia {
-			padding: 15px;
+		button {
+			padding: 10px;
 			border-radius: var(--radio-borde-pequeno);
 			font-size: 16px;
 			font-weight: bold;
@@ -139,23 +140,25 @@
 			border: none;
 			cursor: pointer;
 			letter-spacing: 1px;
-			text-transform: uppercase;
+			color: var(--color-fondo);
 			transition: var(--transicion-rapida), var(--transicion-transformacion);
 		}
 
-		button:active, .modal-boton-ia:active {
+		button:active {
 			transform: scale(0.98);
+		}
+
+		button:focus {
+			outline: 2px solid var(--color-primario);
+			outline-offset: 2px;
 		}
 
 		form button {
 			background-color: var(--color-primario);
-			color: white;
-			margin-top: 10px;
 		}
 
 		form button:hover {
 			background-color: var(--color-primario-hover);
-			box-shadow: 0 4px 10px rgba(98, 0, 234, 0.3);
 		}
 
 		/* ============================
@@ -187,38 +190,45 @@
 			position: relative;
 		}
 
-		.modal-boton-cerrar {
+		/* Botones en la ventana modal */
+		.modal-boton-cerrar,
+		.modal-boton-eliminar {
 			background-color: var(--color-peligro);
-			color: white;
 			width: 100%;
-			margin-bottom: 15px;
+			margin: var(--espaciado-botones-modal) 0;
 		}
 
-		.modal-boton-cerrar:hover {
+		.modal-boton-cerrar:hover,
+		.modal-boton-eliminar:hover {
 			background-color: var(--color-peligro-hover);
 		}
 
-		/* Botones de IA específicos */
+		/* Botones de IA (ChatGPT) */
 		.modal-boton-ia {
 			display: block;
+			margin: var(--espaciado-botones-modal) 0;
+			padding: 10px;
+			background-color: var(--color-primario);
+			color: var(--color-fondo);
 			width: 100%;
 			text-align: center;
 			text-decoration: none;
-			margin-bottom: 10px;
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 16px;
+			font-weight: bold;
+			letter-spacing: 1px;
+			transition: var(--transicion-rapida), var(--transicion-transformacion);
+			cursor: pointer;
+			box-sizing: border-box;
 		}
 
-		#modalBotonChatGPT {
-			background-color: #10a37f;
-			color: white;
+		.modal-boton-ia:hover {
+			background-color: var(--color-primario-hover);
 		}
 
-		#modalBotonCopiar {
-			background-color: #6c757d;
-			color: white;
+		.modal-boton-ia:active {
+			transform: scale(0.98);
 		}
-
-		#modalBotonChatGPT:hover { background-color: #0d8a67; }
-		#modalBotonCopiar:hover { background-color: #5a6268; }
 
 		/* Resultado en la ventana modal */
 		#modalResultado {
