@@ -339,7 +339,7 @@
 				<div>
 					<label for="nivelDetalle">Nivel de detalle de la respuesta:</label>
 					<select id="nivelDetalle">
-						<option value="">Selecciona que respuesta quieres</option>
+						<option value="">Selecciona qué respuesta quieres</option>
 						<option value="completo">Pregunta con respuesta y explicación técnica</option>
 						<option value="solo_respuesta">Pregunta con respuesta solamente</option>
 						<option value="solo_pregunta">Solo pregunta (sin respuesta ni explicación)</option>
@@ -348,7 +348,7 @@
 				<!-- Botón para generar el prompt y abrir la ventana modal -->
 				<div style="position: relative;">
 					<div id="avisoValidacion" class="modal-aviso">⚠️ Por favor, completa todos los campos</div>
-					<button type="submit">GENERAR PROMPT DE PREGUNTAS</button>
+					<button type="submit">GENERAR PROMPT DE PREGUNTA</button>
 				</div>
 			</form>
 		</div>
@@ -583,7 +583,7 @@
 					'Análisis crítico de medios de comunicación', 'Creación de contenido digital responsable', 'Seguridad y privacidad en línea', 'Ciudadanía digital y netiqueta', 'Desinformación, fake news y propaganda', 'Big data y su impacto en la democracia', 'Alfabetización en redes sociales', 'Uso ético de la tecnología', 'Brecha digital y acceso a la información', 'Innovación tecnológica y participación ciudadana'
 				],
 				'Sostenibilidad y conciencia global': [
-					'Objetivos de Desarrollo Sostenible (ODS)', 'Cambio climático y acción ciudadana', 'Consumo responsable y economía circular', 'Biodiversidad y conservation', 'Justicia ambiental y ecología social', 'Energías renovables y transición energética', 'Seguridad alimentaria y agricultura sostenible', 'Ciudades sostenibles e inteligentes', 'Cooperación internacional para el desarrollo sostenible', 'Educación para el desarrollo sostenible'
+					'Objetivos de Desarrollo Sostenible (ODS)', 'Cambio climático y acción ciudadana', 'Consumo responsable y economía circular', 'Biodiversidad y conservación', 'Justicia ambiental y ecología social', 'Energías renovables y transición energética', 'Seguridad alimentaria y agricultura sostenible', 'Ciudades sostenibles e inteligentes', 'Cooperación internacional para el desarrollo sostenible', 'Educación para el desarrollo sostenible'
 				],
 				'Derechos humanos y justicia': [
 					'Historia y evolución de los derechos humanos', 'Sistemas de protección de derechos humanos', 'Violaciones de derechos humanos y su denuncia', 'Derechos de grupos vulnerables y minorías', 'Justicia transicional y construcción de paz', 'Derecho internacional humanitario', 'Acceso a la justicia y debido proceso', 'Reforma del sistema de justicia', 'Justicia restaurativa y alternativa', 'Derechos digitales y privacidad'
@@ -753,7 +753,7 @@ Competencia 3 - Diálogo dialéctico y crítico: Identificar supuestos implícit
 					break;
 				case "MATEMÁTICAS":
 					promptMateria = `
-Competencia 1 - Interpretación y representation: Capacidad de comprender y transformar información presentada en diversos formatos (tablas, gráficas, conjuntos de datos, diagramas). Incluye la extracción de información relevante e identificación de tendencias y patrones.
+Competencia 1 - Interpretación y representación: Capacidad de comprender y transformar información presentada en diversos formatos (tablas, gráficas, conjuntos de datos, diagramas). Incluye la extracción de información relevante e identificación de tendencias y patrones.
 Competencia 2 - Formulación y ejecución: Capacidad de plantear y diseñar estrategias para resolver problemas en contextos matemáticos y de la vida cotidiana. Implica seleccionar y verificar la pertinencia de soluciones y procedimientos.
 Competencia 3 - Argumentación: Capacidad de validar o refutar conclusiones, estrategias y soluciones mediante justificaciones, ejemplos y contraejemplos, identificando inconsistencias o errores en razonamientos.`;
 					break;
@@ -819,7 +819,7 @@ Los niveles evaluados son Pre-A1, A1, A2 y B1 según el Marco Común Europeo de 
 7. **Justificación de opciones no válidas**: Explicación técnica de por qué cada distractor es incorrecto.`;
 					break;
 				case 'solo_respuesta':
-					instruccionAnalisis = 'Proporciona la clave de respuestas correcta al final.';
+					instruccionAnalisis = 'Proporciona la clave de respuesta correcta al final.';
 					break;
 				case 'solo_pregunta':
 					instruccionAnalisis = 'NO proporciones la clave de respuesta correcta ni ninguna explicación o análisis técnico. El prompt debe generar únicamente el contexto, el enunciado y las opciones de respuesta.';
